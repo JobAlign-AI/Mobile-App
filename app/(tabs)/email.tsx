@@ -125,10 +125,10 @@ export default function EmailPage() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <LinearGradient colors={["#111827", "#1F2937"]} style={styles.header}>
+        <LinearGradient colors={["#0A0A0A", "#1A1A1A"]} style={styles.header}>
           <View style={styles.headerContent}>
             <View style={styles.headerIcon}>
-              <Ionicons name="mail" size={28} color="#6366F1" />
+              <Ionicons name="mail" size={28} color="#FFFFFF" />
             </View>
             <View style={styles.headerText}>
               <Text style={styles.headerTitle}>HR Email Center</Text>
@@ -147,7 +147,7 @@ export default function EmailPage() {
           >
             <View style={styles.templatesToggleContent}>
               <View style={styles.templatesIcon}>
-                <Ionicons name="document-text" size={24} color="#10B981" />
+                <Ionicons name="document-text" size={24} color="#FFFFFF" />
               </View>
               <View style={styles.templatesTextContainer}>
                 <Text style={styles.templatesTitle}>HR Email Templates</Text>
@@ -174,13 +174,13 @@ export default function EmailPage() {
                   <View
                     style={[
                       styles.templateIcon,
-                      { backgroundColor: "#10B981" + "20" },
+                      { backgroundColor: "#FFFFFF" + "20" },
                     ]}
                   >
                     <Ionicons
                       name={template.icon as any}
                       size={20}
-                      color="#10B981"
+                      color="#FFFFFF"
                     />
                   </View>
                   <View style={styles.templateText}>
@@ -228,7 +228,7 @@ export default function EmailPage() {
               onPress={() => setShowCcBcc(true)}
               style={styles.ccBccToggle}
             >
-              <Ionicons name="add-circle" size={16} color="#6366F1" />
+              <Ionicons name="add-circle" size={16} color="#FFFFFF" />
               <Text style={styles.ccBccToggleText}>Add CC/BCC</Text>
             </Pressable>
           )}
@@ -323,10 +323,10 @@ export default function EmailPage() {
         <View style={styles.actionsContainer}>
           <Pressable onPress={sendEmail} style={styles.sendButton}>
             <LinearGradient
-              colors={["#6366F1", "#4F46E5"]}
+              colors={["#FFFFFF", "#E0E0E0"]}
               style={styles.sendButtonGradient}
             >
-              <Ionicons name="send" size={20} color="#FFFFFF" />
+              <Ionicons name="send" size={20} color="#000000" />
               <Text style={styles.sendButtonText}>Send Email</Text>
             </LinearGradient>
           </Pressable>
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
   templatesIcon: {
     width: 48,
     height: 48,
-    backgroundColor: "#10B981" + "20",
+    backgroundColor: "#FFFFFF" + "20",
     borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   ccBccToggleText: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#6366F1",
+    color: "#FFFFFF",
     marginLeft: 8,
   },
   actionsContainer: {
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     borderRadius: 16,
-    shadowColor: "#6366F1",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
   sendButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#FFFFFF",
+    color: "#000000",
     marginLeft: 8,
   },
   draftButton: {

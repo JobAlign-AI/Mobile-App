@@ -12,7 +12,6 @@ import {
 import { useSignUp } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function SignUpScreen() {
@@ -24,39 +23,278 @@ export default function SignUpScreen() {
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [code, setCode] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [emailFocused, setEmailFocused] = React.useState(false);
+  const [passwordFocused, setPasswordFocused] = React.useState(false);
+  const [codeFocused, setCodeFocused] = React.useState(false);
 
   const onSignUpPress = async () => {
     if (!isLoaded || loading) return;
+
+    // Validate inputs
+    if (!emailAddress.trim()) {
+      Alert.alert(
+        "Email Required",
+        "Please enter your email address to create an account.",
+        [{ text: "OK", style: "default" }]
+      );
+      return;
+    }
+
+    if (!password.trim()) {
+      Alert.alert(
+        "Password Required",
+        "Please enter a password to secure your account.",
+        [{ text: "OK", style: "default" }]
+      );
+      return;
+    }
+
+    if (password.length < 8) {
+      Alert.alert(
+        "Password Too Short",
+        "Your password must be at least 8 characters long for security.",
+        [{ text: "OK", style: "default" }]
+      );
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await signUp.create({ emailAddress, password });
+      const result = await signUp.create({
+        emailAddress: emailAddress.trim(),
+        password,
+      });
+      console.log("Sign up created, status:", result.status);
+
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      console.log("Verification email sent");
+
       setPendingVerification(true);
+
+      // Show success message
+      Alert.alert(
+        "Check Your Email",
+        `We've sent a verification code to ${emailAddress.trim()}. Please check your inbox.`,
+        [{ text: "OK", style: "default" }]
+      );
     } catch (err: any) {
-      Alert.alert("Error", err.errors?.[0]?.message || "Sign up failed");
+      console.error("Sign up error:", err);
+
+      let title = "Sign Up Failed";
+      let message = "Unable to create account. Please try again.";
+
+      if (err.errors && err.errors.length > 0) {
+        const error = err.errors[0];
+        console.error("Error code:", error.code);
+
+        switch (error.code) {
+          case "form_identifier_exists":
+            title = "Account Already Exists";
+            message =
+              "An account with this email already exists. Would you like to sign in instead?";
+            Alert.alert(title, message, [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Sign In",
+                style: "default",
+                onPress: () => router.push("/(auth)/sign-in"),
+              },
+            ]);
+            return;
+
+          case "form_password_pwned":
+            title = "Weak Password";
+            message =
+              "This password has been found in a data breach. Please choose a more secure password.";
+            break;
+
+          case "form_password_length_too_short":
+            title = "Password Too Short";
+            message = "Your password must be at least 8 characters long.";
+            break;
+
+          case "form_param_format_invalid":
+            title = "Invalid Email";
+            message = "Please enter a valid email address.";
+            break;
+
+          default:
+            message = error.longMessage || error.message || message;
+        }
+      }
+
+      Alert.alert(title, message, [{ text: "OK", style: "default" }]);
     } finally {
       setLoading(false);
     }
   };
 
-  const onVerifyPress = async () => {
+  const onResendCode = async () => {
     if (!isLoaded || loading) return;
     setLoading(true);
 
     try {
-      const signUpAttempt = await signUp.attemptEmailAddressVerification({
-        code,
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      Alert.alert(
+        "Code Sent!",
+        `A new verification code has been sent to ${emailAddress.trim()}. Please check your inbox.`,
+        [{ text: "OK", style: "default" }]
+      );
+    } catch (err: any) {
+      console.error("Resend error:", err);
+
+      const errorMessage =
+        err.errors?.[0]?.longMessage ||
+        err.errors?.[0]?.message ||
+        "Unable to resend code. Please try again.";
+
+      Alert.alert("Resend Failed", errorMessage, [
+        { text: "OK", style: "default" },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onBackToSignUp = () => {
+    setPendingVerification(false);
+    setCode("");
+  };
+
+  const onVerifyPress = async () => {
+    if (!isLoaded || loading) return;
+
+    const trimmedCode = code.trim();
+
+    if (!trimmedCode) {
+      Alert.alert(
+        "Code Required",
+        "Please enter the verification code from your email.",
+        [{ text: "OK", style: "default" }]
+      );
+      return;
+    }
+
+    if (trimmedCode.length < 6) {
+      Alert.alert(
+        "Invalid Code",
+        "Verification code must be 6 digits. Please check and try again.",
+        [{ text: "OK", style: "default" }]
+      );
+      return;
+    }
+
+    if (!signUp) {
+      Alert.alert(
+        "Session Expired",
+        "Your sign up session has expired. Please start over.",
+        [
+          {
+            text: "Start Over",
+            style: "default",
+            onPress: () => {
+              setPendingVerification(false);
+              setCode("");
+            },
+          },
+        ]
+      );
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      console.log("Attempting verification...");
+
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code: trimmedCode,
       });
 
-      if (signUpAttempt.status === "complete") {
-        await setActive({ session: signUpAttempt.createdSessionId });
-        router.replace("/(tabs)/home");
+      console.log("Verification status:", completeSignUp.status);
+
+      if (completeSignUp.status === "complete") {
+        console.log("Sign up complete! Signing in...");
+        await setActive({ session: completeSignUp.createdSessionId });
+
+        Alert.alert(
+          "Welcome! 🎉",
+          "Your account has been created successfully.",
+          [
+            {
+              text: "Get Started",
+              style: "default",
+              onPress: () => router.replace("/(tabs)/home"),
+            },
+          ]
+        );
+      } else if (completeSignUp.status === "missing_requirements") {
+        console.log("Email verified, account created");
+
+        Alert.alert(
+          "Account Created! ✅",
+          "Your email has been verified. Please sign in to continue.",
+          [
+            {
+              text: "Sign In",
+              style: "default",
+              onPress: () => {
+                setPendingVerification(false);
+                setCode("");
+                router.replace("/(auth)/sign-in");
+              },
+            },
+          ]
+        );
       } else {
-        Alert.alert("Error", "Verification failed. Please try again.");
+        console.log("Unexpected status:", completeSignUp.status);
+        Alert.alert(
+          "Almost There",
+          "Email verified successfully. Please sign in to complete setup.",
+          [
+            {
+              text: "Sign In",
+              style: "default",
+              onPress: () => router.replace("/(auth)/sign-in"),
+            },
+          ]
+        );
       }
     } catch (err: any) {
-      Alert.alert("Error", err.errors?.[0]?.message || "Verification failed");
+      console.error("Verification error:", err);
+
+      let title = "Verification Failed";
+      let message = "Please check the code and try again.";
+
+      if (err.errors && err.errors.length > 0) {
+        const error = err.errors[0];
+        console.error("Error code:", error.code);
+
+        switch (error.code) {
+          case "form_code_incorrect":
+            title = "Incorrect Code";
+            message =
+              "The verification code you entered is incorrect. Please check and try again.";
+            break;
+
+          case "verification_expired":
+            title = "Code Expired";
+            message =
+              "This verification code has expired. Please request a new one.";
+            break;
+
+          case "form_param_format_invalid":
+            title = "Invalid Code";
+            message = "Please enter a valid 6-digit verification code.";
+            break;
+
+          default:
+            message = error.longMessage || error.message || message;
+        }
+      }
+
+      Alert.alert(title, message, [{ text: "OK", style: "default" }]);
     } finally {
       setLoading(false);
     }
@@ -73,51 +311,86 @@ export default function SignUpScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <LinearGradient
-          colors={["#E0EAFC", "#CFDEF3"]}
+          colors={["#0A0A0A", "#1A1A1A", "#2A2A2A"]}
           style={StyleSheet.absoluteFillObject}
         />
 
         <View style={styles.overlay}>
-          <BlurView intensity={80} tint="light" style={styles.blurCard}>
+          <View style={styles.card}>
+            {/* Back Button */}
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={onBackToSignUp}
+              disabled={loading}
+            >
+              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+
             <View style={styles.header}>
-              <Ionicons name="mail-outline" size={72} color="#007AFF" />
-              <Text style={styles.title}>Verify Your Email</Text>
+              <View style={styles.iconCircle}>
+                <Ionicons name="mail-outline" size={56} color="#FFFFFF" />
+              </View>
+              <Text style={styles.title}>VERIFY YOUR EMAIL</Text>
               <Text style={styles.subtitle}>
-                Enter the verification code sent to{" "}
-                <Text style={{ fontWeight: "600" }}>{emailAddress}</Text>
+                Enter the verification code sent to{"\n"}
+                <Text style={{ fontWeight: "700", color: "#FFFFFF" }}>
+                  {emailAddress}
+                </Text>
               </Text>
             </View>
 
             <View style={styles.form}>
-              <View style={styles.inputWrapper}>
-                <Ionicons name="key-outline" size={20} color="#6B7280" />
+              <Text style={styles.label}>VERIFICATION CODE</Text>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  codeFocused && styles.inputFocused,
+                ]}
+              >
+                <Ionicons name="key-outline" size={20} color="#999999" />
                 <TextInput
                   style={styles.input}
                   value={code}
-                  onChangeText={setCode}
-                  placeholder="Verification code"
-                  placeholderTextColor="#9CA3AF"
-                  keyboardType="number-pad"
+                  onChangeText={(text) => setCode(text.trim())}
+                  placeholder="Enter 6-digit code"
+                  placeholderTextColor="#666666"
+                  keyboardType="default"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="one-time-code"
+                  onFocus={() => setCodeFocused(true)}
+                  onBlur={() => setCodeFocused(false)}
                 />
               </View>
 
               <TouchableOpacity
                 onPress={onVerifyPress}
                 disabled={loading}
-                activeOpacity={0.8}
-                style={styles.buttonContainer}
+                activeOpacity={0.85}
               >
                 <LinearGradient
-                  colors={["#007AFF", "#0A84FF"]}
-                  style={styles.buttonGradient}
+                  colors={["#FFFFFF", "#E0E0E0"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.button}
                 >
                   <Text style={styles.buttonText}>
-                    {loading ? "Verifying..." : "Verify Email"}
+                    {loading ? "VERIFYING..." : "VERIFY EMAIL"}
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={onResendCode}
+                disabled={loading}
+                style={styles.resendButton}
+              >
+                <Text style={styles.resendText}>
+                  Didn't receive code? Resend
+                </Text>
+              </TouchableOpacity>
             </View>
-          </BlurView>
+          </View>
         </View>
       </KeyboardAvoidingView>
     );
@@ -133,56 +406,72 @@ export default function SignUpScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <LinearGradient
-        colors={["#E0EAFC", "#CFDEF3"]}
+        colors={["#0A0A0A", "#1A1A1A", "#2A2A2A"]}
         style={StyleSheet.absoluteFillObject}
       />
 
       <View style={styles.overlay}>
-        <BlurView intensity={80} tint="light" style={styles.blurCard}>
+        <View style={styles.card}>
           <View style={styles.header}>
-            <Ionicons name="person-add-outline" size={72} color="#007AFF" />
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Sign up to get started</Text>
+            <View style={styles.iconCircle}>
+              <Ionicons name="person-add-outline" size={56} color="#FFFFFF" />
+            </View>
+            <Text style={styles.title}>CREATE ACCOUNT</Text>
+            <Text style={styles.subtitle}>Join us today and get started</Text>
           </View>
 
           <View style={styles.form}>
-            <View style={styles.inputWrapper}>
-              <Ionicons name="mail-outline" size={20} color="#6B7280" />
+            <Text style={styles.label}>EMAIL ADDRESS</Text>
+            <View
+              style={[styles.inputWrapper, emailFocused && styles.inputFocused]}
+            >
+              <Ionicons name="mail-outline" size={20} color="#999999" />
               <TextInput
                 style={styles.input}
-                value={emailAddress}
-                onChangeText={setEmailAddress}
-                placeholder="Email address"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="email-address"
                 autoCapitalize="none"
+                value={emailAddress}
+                keyboardType="email-address"
+                onChangeText={(email) => setEmailAddress(email)}
+                placeholder="Enter your email"
+                placeholderTextColor="#666666"
+                onFocus={() => setEmailFocused(true)}
+                onBlur={() => setEmailFocused(false)}
               />
             </View>
 
-            <View style={styles.inputWrapper}>
-              <Ionicons name="lock-closed-outline" size={20} color="#6B7280" />
+            <Text style={styles.label}>PASSWORD</Text>
+            <View
+              style={[
+                styles.inputWrapper,
+                passwordFocused && styles.inputFocused,
+              ]}
+            >
+              <Ionicons name="lock-closed-outline" size={20} color="#999999" />
               <TextInput
                 style={styles.input}
                 value={password}
-                onChangeText={setPassword}
-                placeholder="Password"
-                placeholderTextColor="#9CA3AF"
+                onChangeText={(password) => setPassword(password)}
+                placeholder="Enter your password"
+                placeholderTextColor="#666666"
                 secureTextEntry
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
               />
             </View>
 
             <TouchableOpacity
               onPress={onSignUpPress}
               disabled={loading}
-              activeOpacity={0.8}
-              style={styles.buttonContainer}
+              activeOpacity={0.85}
             >
               <LinearGradient
-                colors={["#007AFF", "#0A84FF"]}
-                style={styles.buttonGradient}
+                colors={["#FFFFFF", "#E0E0E0"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.button}
               >
                 <Text style={styles.buttonText}>
-                  {loading ? "Creating Account..." : "Create Account"}
+                  {loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
                 </Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -190,97 +479,152 @@ export default function SignUpScreen() {
             <View style={styles.linkContainer}>
               <Text style={styles.linkText}>Already have an account? </Text>
               <Link href="/(auth)/sign-in">
-                <Text style={styles.linkHighlight}>Sign in</Text>
+                <Text style={styles.linkHighlight}>Sign In</Text>
               </Link>
             </View>
           </View>
-        </BlurView>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
 /* ----------------------------
-   Modern iOS-glass style sheet
+   Modern Dark Theme
    ---------------------------- */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#E5E7EB" },
+  container: {
+    flex: 1,
+    backgroundColor: "#0A0A0A",
+  },
   overlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
   },
-  blurCard: {
+  card: {
     width: "100%",
     borderRadius: 24,
-    padding: 28,
+    padding: 32,
+    backgroundColor: "rgba(26, 26, 26, 0.95)",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 4 },
-    backgroundColor: "rgba(255,255,255,0.4)",
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  backButton: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   header: {
     alignItems: "center",
-    marginBottom: 32,
+    marginBottom: 40,
+  },
+  iconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   title: {
     fontSize: 28,
-    fontWeight: "700",
-    color: "#111827",
-    marginTop: 8,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    marginBottom: 8,
+    letterSpacing: 2,
   },
   subtitle: {
     fontSize: 16,
-    color: "#6B7280",
+    color: "#999999",
     marginTop: 4,
     textAlign: "center",
+    letterSpacing: 0.5,
   },
-  form: { width: "100%" },
+  form: {
+    width: "100%",
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#999999",
+    marginBottom: 8,
+    marginTop: 16,
+    letterSpacing: 1.5,
+  },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.6)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderWidth: 1,
-    borderColor: "rgba(209,213,219,0.5)",
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    marginBottom: 14,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    marginBottom: 8,
+  },
+  inputFocused: {
+    borderColor: "#FFFFFF",
+    borderWidth: 2,
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#111827",
-    marginLeft: 10,
+    color: "#FFFFFF",
+    marginLeft: 12,
+    fontWeight: "500",
   },
-  buttonContainer: {
-    borderRadius: 14,
-    overflow: "hidden",
-    marginTop: 10,
-  },
-  buttonGradient: {
-    paddingVertical: 16,
+  button: {
+    borderRadius: 12,
+    paddingVertical: 18,
     alignItems: "center",
-    borderRadius: 14,
+    marginTop: 32,
   },
   buttonText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "600",
+    color: "#000000",
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: 1.5,
   },
   linkContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 22,
+    marginTop: 32,
   },
-  linkText: { color: "#6B7280", fontSize: 15 },
+  linkText: {
+    color: "#999999",
+    fontSize: 15,
+    fontWeight: "500",
+  },
   linkHighlight: {
-    color: "#007AFF",
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "700",
+    textDecorationLine: "underline",
+  },
+  resendButton: {
+    marginTop: 20,
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  resendText: {
+    color: "#999999",
     fontSize: 15,
     fontWeight: "600",
+    textDecorationLine: "underline",
   },
 });

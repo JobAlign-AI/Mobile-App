@@ -26,37 +26,37 @@ export default function Home() {
     {
       title: "Software Engineer",
       icon: "code-slash" as const,
-      color: "#6366F1",
+      color: "#FFFFFF",
       description: "Full-stack development with modern frameworks",
     },
     {
       title: "Data Scientist",
       icon: "analytics" as const,
-      color: "#10B981",
+      color: "#FFFFFF",
       description: "Machine learning and data analysis",
     },
     {
       title: "UI/UX Designer",
       icon: "color-palette" as const,
-      color: "#F59E0B",
+      color: "#FFFFFF",
       description: "User interface and experience design",
     },
     {
       title: "DevOps Engineer",
       icon: "server" as const,
-      color: "#EF4444",
+      color: "#FFFFFF",
       description: "Infrastructure and deployment automation",
     },
     {
       title: "Product Manager",
       icon: "briefcase" as const,
-      color: "#8B5CF6",
+      color: "#FFFFFF",
       description: "Product strategy and development",
     },
     {
       title: "AI Research Scientist",
       icon: "bulb" as const,
-      color: "#06B6D4",
+      color: "#FFFFFF",
       description: "Artificial intelligence and research",
     },
   ];
@@ -86,11 +86,7 @@ export default function Home() {
   };
 
   const getSimilarityColor = (score: string) => {
-    const num = parseFloat(score);
-    if (num >= 90) return "#10B981";
-    if (num >= 75) return "#F59E0B";
-    if (num >= 60) return "#EF4444";
-    return "#6B7280";
+    return "#FFFFFF";
   };
 
   const getSimilarityText = (score: string) => {
@@ -107,7 +103,7 @@ export default function Home() {
         {/* Header Section */}
         <View style={styles.headerContainer}>
           <LinearGradient
-            colors={["#111827", "#1f2937"]}
+            colors={["#0A0A0A", "#1A1A1A"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.headerGradient}
@@ -115,7 +111,7 @@ export default function Home() {
             <View style={styles.headerContent}>
               <View style={styles.headerRow}>
                 <View style={styles.iconContainer}>
-                  <Ionicons name="document-text" size={32} color="#6366F1" />
+                  <Ionicons name="document-text" size={32} color="#FFFFFF" />
                 </View>
                 <View style={styles.headerTextContainer}>
                   <Text style={styles.headerTitle}>JobAlign AI</Text>
@@ -156,7 +152,7 @@ export default function Home() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionIconContainer}>
-                <Ionicons name="cloud-upload" size={24} color="#6366F1" />
+                <Ionicons name="cloud-upload" size={24} color="#FFFFFF" />
               </View>
               <View style={styles.sectionTextContainer}>
                 <Text style={styles.sectionTitle}>Upload Your CV</Text>
@@ -169,7 +165,7 @@ export default function Home() {
             <Pressable onPress={pickDocument} style={styles.uploadButton}>
               <LinearGradient
                 colors={
-                  cvName ? ["#10B981", "#059669"] : ["#6366F1", "#4F46E5"]
+                  cvName ? ["#FFFFFF", "#E0E0E0"] : ["#FFFFFF", "#D0D0D0"]
                 }
                 style={styles.uploadButtonGradient}
               >
@@ -177,7 +173,7 @@ export default function Home() {
                   <Ionicons
                     name={cvName ? "checkmark-circle" : "cloud-upload"}
                     size={24}
-                    color="white"
+                    color="#000000"
                   />
                   <Text style={styles.uploadButtonText}>
                     {cvName
@@ -191,11 +187,11 @@ export default function Home() {
             {cvName && (
               <View style={styles.uploadSuccess}>
                 <View style={styles.uploadSuccessContent}>
-                  <Ionicons name="document-text" size={20} color="#10B981" />
+                  <Ionicons name="document-text" size={20} color="#FFFFFF" />
                   <Text style={styles.uploadSuccessText} numberOfLines={1}>
                     {cvName}
                   </Text>
-                  <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+                  <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
                 </View>
               </View>
             )}
@@ -256,11 +252,11 @@ export default function Home() {
               style={styles.analyzeButtonContainer}
             >
               <LinearGradient
-                colors={["#8B5CF6", "#7C3AED"]}
+                colors={["#FFFFFF", "#E0E0E0"]}
                 style={styles.analyzeButton}
               >
                 <View style={styles.analyzeButtonContent}>
-                  <Ionicons name="analytics" size={24} color="white" />
+                  <Ionicons name="analytics" size={24} color="#000000" />
                   <Text style={styles.analyzeButtonText}>Analyze CV Match</Text>
                 </View>
               </LinearGradient>
@@ -272,7 +268,7 @@ export default function Home() {
             <View style={styles.section}>
               <View style={styles.loadingContainer}>
                 <View style={styles.loadingIcon}>
-                  <Ionicons name="analytics" size={40} color="#6366F1" />
+                  <Ionicons name="analytics" size={40} color="#FFFFFF" />
                 </View>
                 <Text style={styles.loadingTitle}>Analyzing Your CV</Text>
                 <Text style={styles.loadingDescription}>
@@ -497,7 +493,7 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6366F1",
+    color: "#FFFFFF",
     marginBottom: 4,
   },
   statLabel: {
@@ -532,7 +528,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 16,
-    backgroundColor: "rgba(99, 102, 241, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 16,
@@ -551,15 +547,15 @@ const styles = StyleSheet.create({
     color: "#9CA3AF",
   },
   changeButton: {
-    backgroundColor: "rgba(99, 102, 241, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "rgba(99, 102, 241, 0.3)",
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   changeButtonText: {
-    color: "#6366F1",
+    color: "#FFFFFF",
     fontWeight: "600",
     fontSize: 14,
   },
@@ -578,7 +574,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   uploadButtonText: {
-    color: "#FFFFFF",
+    color: "#000000",
     fontSize: 18,
     fontWeight: "600",
     marginLeft: 12,
@@ -586,17 +582,17 @@ const styles = StyleSheet.create({
   uploadSuccess: {
     marginTop: 16,
     padding: 16,
-    backgroundColor: "rgba(16, 185, 129, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(16, 185, 129, 0.3)",
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   uploadSuccessContent: {
     flexDirection: "row",
     alignItems: "center",
   },
   uploadSuccessText: {
-    color: "#10B981",
+    color: "#FFFFFF",
     fontWeight: "500",
     marginLeft: 8,
     flex: 1,
@@ -634,7 +630,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   analyzeButtonText: {
-    color: "#FFFFFF",
+    color: "#000000",
     fontSize: 18,
     fontWeight: "600",
     marginLeft: 12,
@@ -647,7 +643,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "rgba(99, 102, 241, 0.2)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
@@ -675,7 +671,7 @@ const styles = StyleSheet.create({
   progressBar: {
     width: "75%",
     height: "100%",
-    backgroundColor: "#6366F1",
+    backgroundColor: "#FFFFFF",
     borderRadius: 4,
   },
   loadingNote: {
@@ -739,10 +735,10 @@ const styles = StyleSheet.create({
   },
   recommendationContainer: {
     padding: 16,
-    backgroundColor: "rgba(99, 102, 241, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(99, 102, 241, 0.3)",
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   recommendationTitle: {
     fontSize: 18,
@@ -796,19 +792,21 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   modalContent: {
     backgroundColor: "#1F2937",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    maxHeight: "80%",
+    borderRadius: 24,
+    height: "80%",
+    width: "90%",
     borderWidth: 1,
     borderColor: "#374151",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
     elevation: 16,
   },
   modalHeader: {
@@ -843,17 +841,17 @@ const styles = StyleSheet.create({
   modalScrollView: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingVertical: 20,
   },
   jobOption: {
-    marginBottom: 16,
-    padding: 16,
+    marginBottom: 20,
+    padding: 20,
     borderRadius: 16,
     borderWidth: 2,
   },
   selectedJobOption: {
-    borderColor: "rgba(99, 102, 241, 0.5)",
-    backgroundColor: "rgba(99, 102, 241, 0.1)",
+    borderColor: "rgba(255, 255, 255, 0.5)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   unselectedJobOption: {
     borderColor: "#374151",
@@ -880,7 +878,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   selectedJobTitle: {
-    color: "#6366F1",
+    color: "#FFFFFF",
   },
   unselectedJobTitle: {
     color: "#FFFFFF",
@@ -888,7 +886,7 @@ const styles = StyleSheet.create({
   jobOptionDescription: {
     fontSize: 14,
     color: "#9CA3AF",
-    lineHeight: 20,
+    lineHeight: 22,
   },
   modalFooter: {
     padding: 24,

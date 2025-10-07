@@ -1,25 +1,19 @@
-import { SignedIn, SignedOut, useUser } from "@clerk/clerk-expo";
-import { Link } from "expo-router";
-import { Text, View } from "react-native";
-import { SignOutButton } from "./../components/SignOutButton";
+import { ClerkProvider } from "@clerk/clerk-expo";
+import { Slot } from "expo-router";
+import "../global.css";
 
-export default function Page() {
-  const { user } = useUser();
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
+if (!publishableKey) {
+  throw new Error(
+    "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env"
+  );
+}
+
+export default function RootLayout() {
   return (
-    <View>
-      <SignedIn>
-        <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
-        <SignOutButton />
-      </SignedIn>
-      <SignedOut>
-        <Link href="/(auth)/sign-in">
-          <Text>Sign in</Text>
-        </Link>
-        <Link href="/(auth)/sign-up">
-          <Text>Sign up</Text>
-        </Link>
-      </SignedOut>
-    </View>
+    <ClerkProvider publishableKey={publishableKey}>
+      <Slot />
+    </ClerkProvider>
   );
 }

@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { SignOutButton } from "@/components/SignOutButton";
 
 const { width } = Dimensions.get("window");
 
@@ -49,7 +50,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
 }) => (
   <Pressable onPress={onPress} style={styles.settingItem}>
     <View style={styles.iconContainer}>
-      <Ionicons name={icon as any} size={20} color="#8B5CF6" />
+      <Ionicons name={icon as any} size={20} color="#FFFFFF" />
     </View>
     <View style={styles.settingContent}>
       <Text style={styles.settingTitle}>{title}</Text>
@@ -205,7 +206,7 @@ export default function SettingsPage() {
           <View style={styles.profileCard}>
             <View style={styles.profileContent}>
               <LinearGradient
-                colors={["#8B5CF6", "#A855F7"]}
+                colors={["#FFFFFF", "#E0E0E0"]}
                 style={styles.avatarGradient}
               >
                 <Text style={styles.avatarText}>HR</Text>
@@ -222,7 +223,7 @@ export default function SettingsPage() {
                 style={styles.editButton}
               >
                 <LinearGradient
-                  colors={["#8B5CF6", "#A855F7"]}
+                  colors={["#FFFFFF", "#E0E0E0"]}
                   style={styles.buttonGradient}
                 >
                   <Text style={styles.editButtonText}>Edit Profile</Text>
@@ -252,10 +253,10 @@ export default function SettingsPage() {
               style={styles.addJobButton}
             >
               <LinearGradient
-                colors={["#10B981", "#059669"]}
+                colors={["#FFFFFF", "#E0E0E0"]}
                 style={styles.buttonGradient}
               >
-                <Ionicons name="add" size={20} color="#FFFFFF" />
+                <Ionicons name="add" size={20} color="#000000" />
                 <Text style={styles.addJobText}>Add New Job Description</Text>
               </LinearGradient>
             </Pressable>
@@ -387,15 +388,8 @@ export default function SettingsPage() {
             />
           </View>
 
-          {/* Logout Button */}
-          <Pressable
-            onPress={() =>
-              showAlert("Logout", "Are you sure you want to logout?")
-            }
-            style={styles.logoutButton}
-          >
-            <Text style={styles.logoutText}>Logout</Text>
-          </Pressable>
+          {/* Sign Out Button */}
+          <SignOutButton />
         </View>
       </ScrollView>
 
@@ -432,13 +426,13 @@ export default function SettingsPage() {
                       onPress={() => handleEditJob(job)}
                       style={styles.actionButton}
                     >
-                      <Ionicons name="pencil" size={16} color="#8B5CF6" />
+                      <Ionicons name="pencil" size={16} color="#FFFFFF" />
                     </Pressable>
                     <Pressable
                       onPress={() => handleDeleteJob(job.id)}
                       style={styles.actionButton}
                     >
-                      <Ionicons name="trash" size={16} color="#EF4444" />
+                      <Ionicons name="trash" size={16} color="#FFFFFF" />
                     </Pressable>
                   </View>
                 </View>
@@ -618,12 +612,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#0F0F0F",
+    paddingBottom: 60,
   },
   scrollView: {
     flex: 1,
   },
   content: {
     padding: 20,
+    paddingBottom: 100,
   },
   profileCard: {
     backgroundColor: "#1F2937",
@@ -644,7 +640,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   avatarText: {
-    color: "#FFFFFF",
+    color: "#000000",
     fontSize: 28,
     fontWeight: "bold",
   },
@@ -671,7 +667,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   editButtonText: {
-    color: "#FFFFFF",
+    color: "#000000",
     fontSize: 16,
     fontWeight: "600",
   },
@@ -729,22 +725,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   addJobText: {
-    color: "#FFFFFF",
+    color: "#000000",
     fontSize: 16,
     fontWeight: "600",
     marginLeft: 8,
-  },
-  logoutButton: {
-    backgroundColor: "#DC2626",
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  logoutText: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "600",
   },
   modalContainer: {
     flex: 1,
@@ -796,7 +780,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   jobDepartment: {
-    color: "#8B5CF6",
+    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "500",
     marginBottom: 4,
@@ -807,7 +791,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   jobSalary: {
-    color: "#10B981",
+    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "500",
     marginBottom: 4,
@@ -850,7 +834,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   saveButtonText: {
-    color: "#FFFFFF",
+    color: "#000000",
     fontSize: 16,
     fontWeight: "600",
   },

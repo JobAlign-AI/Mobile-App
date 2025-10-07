@@ -15,22 +15,39 @@ export default function Button({
   const getVariantClasses = () => {
     switch (variant) {
       case "primary":
-        return "bg-blue-500 active:bg-blue-600";
+        return "bg-white active:bg-gray-200";
       case "secondary":
-        return "bg-gray-500 active:bg-gray-600";
+        return "bg-zinc-800 active:bg-zinc-700";
       case "danger":
-        return "bg-red-500 active:bg-red-600";
+        return "bg-red-600 active:bg-red-700";
       default:
-        return "bg-blue-500 active:bg-blue-600";
+        return "bg-white active:bg-gray-200";
+    }
+  };
+
+  const getTextClasses = () => {
+    switch (variant) {
+      case "primary":
+        return "text-black";
+      case "secondary":
+        return "text-white";
+      case "danger":
+        return "text-white";
+      default:
+        return "text-black";
     }
   };
 
   return (
     <Pressable
       onPress={onPress}
-      className={`px-6 py-3 rounded-lg ${getVariantClasses()}`}
+      className={`px-6 py-4 rounded-xl ${getVariantClasses()}`}
     >
-      <Text className="text-white font-semibold text-center">{title}</Text>
+      <Text
+        className={`font-bold text-center text-base tracking-wider ${getTextClasses()}`}
+      >
+        {title.toUpperCase()}
+      </Text>
     </Pressable>
   );
 }

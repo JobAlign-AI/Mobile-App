@@ -90,7 +90,7 @@ export default function ChatPage() {
     >
       {item.sender === "ai" && (
         <View style={styles.aiAvatar}>
-          <Ionicons name="sparkles" size={16} color="#6366F1" />
+          <Ionicons name="sparkles" size={16} color="#FFFFFF" />
         </View>
       )}
 
@@ -129,10 +129,10 @@ export default function ChatPage() {
   return (
     <View style={styles.container}>
       {/* Chat Header */}
-      <LinearGradient colors={["#111827", "#1F2937"]} style={styles.header}>
+      <LinearGradient colors={["#0A0A0A", "#1A1A1A"]} style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.aiHeaderAvatar}>
-            <Ionicons name="sparkles" size={24} color="#6366F1" />
+            <Ionicons name="sparkles" size={24} color="#FFFFFF" />
           </View>
           <View style={styles.headerInfo}>
             <Text style={styles.headerTitle}>Chat With the CV</Text>
@@ -192,7 +192,7 @@ export default function ChatPage() {
               <LinearGradient
                 colors={
                   message.trim()
-                    ? ["#6366F1", "#4F46E5"]
+                    ? ["#FFFFFF", "#E0E0E0"]
                     : ["#374151", "#374151"]
                 }
                 style={styles.sendButtonGradient}
@@ -200,7 +200,7 @@ export default function ChatPage() {
                 <Ionicons
                   name="send"
                   size={20}
-                  color={message.trim() ? "#FFFFFF" : "#9CA3AF"}
+                  color={message.trim() ? "#000000" : "#9CA3AF"}
                 />
               </LinearGradient>
             </Pressable>
@@ -274,13 +274,13 @@ const styles = StyleSheet.create({
   onlineIndicator: {
     width: 8,
     height: 8,
-    backgroundColor: "#10B981",
+    backgroundColor: "#FFFFFF",
     borderRadius: 4,
     marginRight: 6,
   },
   statusText: {
     fontSize: 14,
-    color: "#10B981",
+    color: "#FFFFFF",
     fontWeight: "500",
   },
   moreButton: {
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   userBubble: {
-    backgroundColor: "#6366F1",
+    backgroundColor: "#FFFFFF",
     borderBottomRightRadius: 6,
     marginLeft: 40,
   },
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   userText: {
-    color: "#FFFFFF",
+    color: "#000000",
   },
   aiText: {
     color: "#F3F4F6",
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   userTimestamp: {
-    color: "#C7D2FE",
+    color: "#999999",
     textAlign: "right",
   },
   aiTimestamp: {
@@ -361,12 +361,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 8,
     borderWidth: 2,
-    borderColor: "#6366F1",
+    borderColor: "#FFFFFF",
   },
   userAvatar: {
     width: 32,
     height: 32,
-    backgroundColor: "#6366F1",
+    backgroundColor: "#FFFFFF",
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   sendButtonActive: {
-    shadowColor: "#6366F1",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

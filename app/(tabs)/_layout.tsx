@@ -1,9 +1,9 @@
 import React from "react";
 import { Tabs, Redirect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
-import { SafeAreaView, Platform, View, StyleSheet } from "react-native";
+import { Platform, View, StyleSheet } from "react-native";
 import { useAuth } from "@clerk/clerk-expo";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function TabLayout() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -19,112 +19,98 @@ export default function TabLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <BlurView
-        tint="light"
-        intensity={Platform.OS === "ios" ? 80 : 120}
-        style={{
-          ...StyleSheet.absoluteFillObject,
-          backgroundColor: "rgba(255,255,255,0.3)",
+    <View style={{ flex: 1, backgroundColor: "#0A0A0A" }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarShowLabel: true,
+          tabBarActiveTintColor: "#FFFFFF",
+          tabBarInactiveTintColor: "#666666",
+          tabBarLabelStyle: {
+            fontSize: 11,
+            fontWeight: "700",
+            marginBottom: Platform.OS === "ios" ? 2 : 6,
+            letterSpacing: 0.5,
+          },
+          tabBarStyle: {
+            position: "absolute",
+            bottom: 16,
+            left: 16,
+            right: 16,
+            height: 75,
+            borderRadius: 20,
+            borderTopWidth: 0,
+            overflow: "hidden",
+            backgroundColor: "rgba(26, 26, 26, 0.95)",
+            borderWidth: 1,
+            borderColor: "rgba(255, 255, 255, 0.1)",
+            paddingTop: 10,
+            paddingBottom: Platform.OS === "ios" ? 20 : 10,
+          },
+          tabBarBackground: () => (
+            <LinearGradient
+              colors={["rgba(26, 26, 26, 0.98)", "rgba(20, 20, 20, 0.98)"]}
+              style={{ flex: 1 }}
+            />
+          ),
         }}
-      />
-      <View style={{ flex: 1, backgroundColor: "#F9FAFB" }}>
-        <Tabs
-          screenOptions={{
-            headerShown: false,
-            tabBarShowLabel: true,
-            tabBarActiveTintColor: "#000000",
-            tabBarInactiveTintColor: "#6B7280",
-            tabBarLabelStyle: {
-              fontSize: 12,
-              fontWeight: "600",
-              marginBottom: Platform.OS === "ios" ? 2 : 6,
-            },
-            tabBarStyle: {
-              position: "absolute",
-              bottom: 16,
-              left: 16,
-              right: 16,
-              height: 70,
-              borderRadius: 24,
-              borderTopWidth: 0,
-              overflow: "hidden",
-              backgroundColor: "rgba(255,255,255,0.85)",
-              shadowColor: "#000",
-              shadowOpacity: 0.15,
-              shadowRadius: 8,
-              elevation: 6,
-              paddingTop: 10,
-            },
-            tabBarBackground: () => (
-              <BlurView
-                tint="light"
-                intensity={Platform.OS === "ios" ? 50 : 90}
-                style={{
-                  flex: 1,
-                  backgroundColor: "rgba(255,255,255,0.7)",
-                }}
+      >
+        <Tabs.Screen
+          name="home"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
+                size={26}
+                color={color}
               />
             ),
           }}
-        >
-          <Tabs.Screen
-            name="home"
-            options={{
-              title: "Home",
-              tabBarIcon: ({ color, focused }) => (
-                <Ionicons
-                  name={focused ? "home" : "home-outline"}
-                  size={26}
-                  color={color}
-                />
-              ),
-            }}
-          />
+        />
 
-          <Tabs.Screen
-            name="chat"
-            options={{
-              title: "Chat",
-              tabBarIcon: ({ color, focused }) => (
-                <Ionicons
-                  name={focused ? "chatbubbles" : "chatbubbles-outline"}
-                  size={26}
-                  color={color}
-                />
-              ),
-            }}
-          />
+        <Tabs.Screen
+          name="chat"
+          options={{
+            title: "Chat",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "chatbubbles" : "chatbubbles-outline"}
+                size={26}
+                color={color}
+              />
+            ),
+          }}
+        />
 
-          <Tabs.Screen
-            name="email"
-            options={{
-              title: "Email",
-              tabBarIcon: ({ color, focused }) => (
-                <Ionicons
-                  name={focused ? "mail" : "mail-outline"}
-                  size={26}
-                  color={color}
-                />
-              ),
-            }}
-          />
+        <Tabs.Screen
+          name="email"
+          options={{
+            title: "Email",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "mail" : "mail-outline"}
+                size={26}
+                color={color}
+              />
+            ),
+          }}
+        />
 
-          <Tabs.Screen
-            name="settings"
-            options={{
-              title: "Settings",
-              tabBarIcon: ({ color, focused }) => (
-                <Ionicons
-                  name={focused ? "settings" : "settings-outline"}
-                  size={26}
-                  color={color}
-                />
-              ),
-            }}
-          />
-        </Tabs>
-      </View>
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "person" : "person-outline"}
+                size={26}
+                color={color}
+              />
+            ),
+          }}
+        />
+      </Tabs>
     </View>
   );
 }
