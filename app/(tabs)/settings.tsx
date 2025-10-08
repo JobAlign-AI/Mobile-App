@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    paddingBottom: 100,
+    paddingBottom: 50,
   },
   profileCard: {
     backgroundColor: "#1F2937",
