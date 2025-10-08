@@ -10,5 +10,5 @@ export default function Page() {
   }
 
   // If not signed in, redirect to sign-up page (create account)
-  return <Redirect href="/(auth)/sign-up" />;
+  return <Redirect href="/(auth)/sign-in" />;
 }
