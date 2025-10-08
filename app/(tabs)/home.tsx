@@ -463,6 +463,7 @@ const styles = StyleSheet.create({
     color: "#D1D5DB",
     lineHeight: 24,
     opacity: 0.9,
+    marginBottom: 35,
   },
   statsCardContainer: {
     position: "absolute",
@@ -505,6 +506,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 24,
     marginTop: 30,
+    marginBottom: 50,
   },
   section: {
     backgroundColor: "#1F2937",

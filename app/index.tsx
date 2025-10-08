@@ -9,6 +9,6 @@ export default function Page() {
     return <Redirect href="/(tabs)/home" />;
   }
 
-  // If not signed in, redirect to sign-up page (create account)
+  // If not signed in, redirect to sign-in page (login screen)
   return <Redirect href="/(auth)/sign-in" />;
 }
