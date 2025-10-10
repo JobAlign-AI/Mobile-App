@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  StatusBar,
+  SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,536 +32,529 @@ export default function EmailPage() {
   const [showCcBcc, setShowCcBcc] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
 
+  const [focus, setFocus] = useState<
+    null | "to" | "cc" | "bcc" | "subject" | "body"
+  >(null);
+
   const emailTemplates: EmailTemplate[] = [
     {
       id: "1",
       name: "Interview Invitation",
       subject: "Interview Invitation - [Position Name] at [Company Name]",
-      body: "Dear [Candidate Name],\n\nThank you for your interest in the [Position Name] role at [Company Name]. We were impressed with your application and would like to invite you for an interview.\n\nInterview Details:\n• Date: [Date]\n• Time: [Time]\n• Location: [Address/Virtual Meeting Link]\n• Duration: Approximately [Duration]\n• Interviewers: [Names and Titles]\n\nPlease confirm your availability by replying to this email. If you have any questions or need to reschedule, please don't hesitate to reach out.\n\nWe look forward to meeting you!\n\nBest regards,\n[Your Name]\n[Your Title]\n[Company Name]",
+      body: "Dear [Candidate Name],\n\nThank you for your interest in the [Position Name] role at [Company Name]. We were impressed with your application and would like to invite you for an interview.\n\nInterview Details:\n• Date: [Date]\n• Time: [Time]\n• Location: [Address/Virtual Meeting Link]\n• Duration: Approximately [Duration]\n• Interviewers: [Names and Titles]\n\nPlease confirm your availability by replying to this email.\n\nBest regards,\n[Your Name]\n[Your Title]\n[Company Name]",
       icon: "calendar",
     },
     {
       id: "2",
       name: "Job Offer",
       subject: "Job Offer - [Position Name] at [Company Name]",
-      body: "Dear [Candidate Name],\n\nCongratulations! We are pleased to offer you the position of [Position Name] at [Company Name].\n\nOffer Details:\n• Position: [Position Name]\n• Department: [Department]\n• Start Date: [Start Date]\n• Salary: [Salary Amount]\n• Benefits: [Benefits Summary]\n• Reporting Manager: [Manager Name]\n\nThis offer is contingent upon [any conditions, e.g., background check, references].\n\nPlease review the attached offer letter and let us know your decision by [Deadline Date]. We're excited about the possibility of you joining our team!\n\nBest regards,\n[Your Name]\n[Your Title]\n[Company Name]",
+      body: "Dear [Candidate Name],\n\nCongratulations! We are pleased to offer you the position of [Position Name] at [Company Name].\n\nOffer Details:\n• Position: [Position Name]\n• Start Date: [Start Date]\n• Salary: [Salary]\n\nPlease review the attached offer letter and let us know your decision by [Deadline Date].\n\nBest regards,\n[Your Name]\n[Company Name]",
       icon: "gift",
     },
     {
       id: "3",
       name: "Application Rejection",
       subject: "Update on your application - [Position Name]",
-      body: "Dear [Candidate Name],\n\nThank you for your interest in the [Position Name] role at [Company Name] and for taking the time to interview with our team.\n\nAfter careful consideration, we have decided to move forward with another candidate whose experience more closely aligns with our current needs.\n\nWe were impressed with your [specific positive feedback] and encourage you to apply for future opportunities that match your skills and interests. We will keep your resume on file for six months.\n\nThank you again for your time and interest in [Company Name]. We wish you the best in your job search.\n\nBest regards,\n[Your Name]\n[Your Title]\n[Company Name]",
+      body: "Dear [Candidate Name],\n\nThank you for interviewing for the [Position Name] at [Company Name]. After careful consideration, we have decided to move forward with another candidate.\n\nWe appreciate your time and interest, and encourage you to apply for future roles.\n\nBest regards,\n[Your Name]\n[Company Name]",
       icon: "document",
-    },
-    {
-      id: "4",
-      name: "Onboarding Welcome",
-      subject: "Welcome to [Company Name] - First Day Information",
-      body: "Dear [Employee Name],\n\nWelcome to [Company Name]! We're thrilled to have you join our team as [Position Name].\n\nFirst Day Details:\n• Date: [Start Date]\n• Time: [Start Time]\n• Location: [Office Address/Remote Instructions]\n• Contact: [HR Contact] at [Phone/Email]\n\nWhat to Expect:\n• Orientation session with HR\n• Meet your team and manager\n• IT setup and account creation\n• Review of company policies and procedures\n\nWhat to Bring:\n• Valid ID for I-9 verification\n• Completed onboarding documents\n• Bank details for direct deposit setup\n\nIf you have any questions before your first day, please don't hesitate to reach out.\n\nWe look forward to working with you!\n\nBest regards,\n[Your Name]\n[Your Title]\n[Company Name]",
-      icon: "checkmark-circle",
-    },
-    {
-      id: "5",
-      name: "Reference Check",
-      subject: "Reference Check for [Candidate Name] - [Position Name]",
-      body: "Dear [Reference Name],\n\n[Candidate Name] has applied for the position of [Position Name] at [Company Name] and has listed you as a professional reference.\n\nWe would greatly appreciate your insights regarding [Candidate Name]'s:\n• Work performance and quality\n• Reliability and work ethic\n• Communication and teamwork skills\n• Areas of strength and development\n• Overall recommendation for this role\n\nWould you be available for a brief 10-15 minute phone call this week? Alternatively, you can respond to this email with your feedback.\n\nAll information will be kept confidential and used solely for employment evaluation purposes.\n\nThank you for your time and assistance.\n\nBest regards,\n[Your Name]\n[Your Title]\n[Company Name]\n[Phone Number]",
-      icon: "people",
-    },
-    {
-      id: "6",
-      name: "Candidate Follow-up",
-      subject: "Update on your application status - [Position Name]",
-      body: "Dear [Candidate Name],\n\nI hope this email finds you well. I wanted to provide you with an update on your application for the [Position Name] role at [Company Name].\n\nWe are currently in the [stage of process, e.g., 'final review stage'] and expect to make our decision by [expected date]. We appreciate your patience during this process.\n\nYour interview performance was [positive feedback] and we are carefully considering all qualified candidates.\n\nWe will contact you with our final decision no later than [date]. In the meantime, please feel free to reach out if you have any questions.\n\nThank you for your continued interest in [Company Name].\n\nBest regards,\n[Your Name]\n[Your Title]\n[Company Name]",
-      icon: "time",
     },
   ];
 
-  const sendEmail = () => {
-    if (!to.trim()) {
-      Alert.alert("Error", "Please enter a recipient email address.");
-      return;
-    }
-    if (!subject.trim()) {
-      Alert.alert("Error", "Please enter a subject.");
-      return;
-    }
-    if (!body.trim()) {
-      Alert.alert("Error", "Please enter a message.");
-      return;
-    }
+  const canSend = useMemo(
+    () => to.trim() && subject.trim() && body.trim(),
+    [to, subject, body]
+  );
 
-    Alert.alert(
-      "Email Sent! ✅",
-      `Your professional email to ${to} has been sent successfully.`,
-      [
-        {
-          text: "OK",
-          onPress: () => {
-            setTo("");
-            setSubject("");
-            setBody("");
-            setCc("");
-            setBcc("");
-            setShowCcBcc(false);
-          },
+  const sendEmail = () => {
+    if (!canSend) return;
+    Alert.alert("Email Sent ✅", `Your email to ${to} has been sent.`, [
+      {
+        text: "OK",
+        onPress: () => {
+          setTo("");
+          setSubject("");
+          setBody("");
+          setCc("");
+          setBcc("");
+          setShowCcBcc(false);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const saveDraft = () => {
     Alert.alert("Draft Saved 💾", "Your email has been saved as a draft.");
   };
 
-  const useTemplate = (template: EmailTemplate) => {
-    setSubject(template.subject);
-    setBody(template.body);
+  const useTemplate = (tpl: EmailTemplate) => {
+    setSubject(tpl.subject);
+    setBody(tpl.body);
     setShowTemplates(false);
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle="light-content" backgroundColor="#0A0A0A" />
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.select({ ios: "padding", android: undefined })}
+        keyboardVerticalOffset={Platform.select({ ios: 8, android: 0 })}
       >
-        {/* Header */}
-        <LinearGradient colors={["#0A0A0A", "#1A1A1A"]} style={styles.header}>
-          <View style={styles.headerContent}>
-            <View style={styles.headerIcon}>
-              <Ionicons name="mail" size={28} color="#FFFFFF" />
-            </View>
-            <View style={styles.headerText}>
-              <Text style={styles.headerTitle}>HR Email Center</Text>
-              <Text style={styles.headerSubtitle}>
-                Professional recruitment communications
-              </Text>
-            </View>
-          </View>
-        </LinearGradient>
-
-        {/* Templates Section */}
-        <View style={styles.section}>
-          <Pressable
-            style={styles.templatesToggle}
-            onPress={() => setShowTemplates(!showTemplates)}
+        <View style={styles.container}>
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
-            <View style={styles.templatesToggleContent}>
-              <View style={styles.templatesIcon}>
-                <Ionicons name="document-text" size={24} color="#FFFFFF" />
+            {/* Header */}
+            <LinearGradient
+              colors={["#0A0A0A", "#1A1A1A"]}
+              style={styles.header}
+            >
+              <View style={styles.headerRow}>
+                <View style={styles.headerIcon}>
+                  <Ionicons name="mail" size={24} color="#FFFFFF" />
+                </View>
+                <View style={styles.headerText}>
+                  <Text style={styles.headerTitle}>HR Email Center</Text>
+                  <Text style={styles.headerSubtitle}>
+                    Professional recruitment communications
+                  </Text>
+                </View>
               </View>
-              <View style={styles.templatesTextContainer}>
-                <Text style={styles.templatesTitle}>HR Email Templates</Text>
-                <Text style={styles.templatesSubtitle}>
-                  Ready-to-use recruitment emails
-                </Text>
-              </View>
-              <Ionicons
-                name={showTemplates ? "chevron-up" : "chevron-down"}
-                size={20}
-                color="#9CA3AF"
-              />
-            </View>
-          </Pressable>
+            </LinearGradient>
 
-          {showTemplates && (
-            <View style={styles.templatesContainer}>
-              {emailTemplates.map((template) => (
-                <Pressable
-                  key={template.id}
-                  style={styles.templateItem}
-                  onPress={() => useTemplate(template)}
-                >
-                  <View
-                    style={[
-                      styles.templateIcon,
-                      { backgroundColor: "#FFFFFF" + "20" },
-                    ]}
-                  >
-                    <Ionicons
-                      name={template.icon as any}
-                      size={20}
-                      color="#FFFFFF"
-                    />
+            {/* Templates */}
+            <View style={styles.section}>
+              <Pressable
+                style={styles.rowCard}
+                onPress={() => setShowTemplates((v) => !v)}
+              >
+                <View style={styles.rowLeft}>
+                  <View style={styles.roundIcon}>
+                    <Ionicons name="document-text" size={20} color="#FFFFFF" />
                   </View>
-                  <View style={styles.templateText}>
-                    <Text style={styles.templateName}>{template.name}</Text>
-                    <Text style={styles.templatePreview} numberOfLines={1}>
-                      {template.subject}
+                  <View style={styles.rowText}>
+                    <Text style={styles.rowTitle}>HR Email Templates</Text>
+                    <Text style={styles.rowSubtitle}>
+                      Ready-to-use recruitment emails
                     </Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={16} color="#6B7280" />
-                </Pressable>
-              ))}
+                </View>
+                <Ionicons
+                  name={showTemplates ? "chevron-up" : "chevron-down"}
+                  size={18}
+                  color="#9CA3AF"
+                />
+              </Pressable>
+
+              {showTemplates && (
+                <View style={styles.templatesList}>
+                  {emailTemplates.map((t) => (
+                    <Pressable
+                      key={t.id}
+                      style={styles.templateItem}
+                      onPress={() => useTemplate(t)}
+                    >
+                      <View style={styles.templateLeft}>
+                        <View style={styles.templateIcon}>
+                          <Ionicons
+                            name={t.icon as any}
+                            size={18}
+                            color="#FFFFFF"
+                          />
+                        </View>
+                        <View style={styles.templateText}>
+                          <Text style={styles.templateName}>{t.name}</Text>
+                          <Text
+                            style={styles.templatePreview}
+                            numberOfLines={1}
+                          >
+                            {t.subject}
+                          </Text>
+                        </View>
+                      </View>
+                      <Ionicons
+                        name="chevron-forward"
+                        size={16}
+                        color="#6B7280"
+                      />
+                    </Pressable>
+                  ))}
+                </View>
+              )}
             </View>
-          )}
-        </View>
 
-        {/* Email Form */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Compose Email</Text>
+            {/* Compose */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Compose Email</Text>
 
-          {/* To Field */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>To *</Text>
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="person"
-                size={20}
-                color="#6B7280"
-                style={styles.inputIcon}
-              />
-              <TextInput
+              {/* To */}
+              <Field
+                label="To *"
+                icon="person"
                 value={to}
+                onFocus={() => setFocus("to")}
+                onBlur={() => setFocus(null)}
                 onChangeText={setTo}
                 placeholder="recipient@company.com"
-                placeholderTextColor="#6B7280"
-                style={styles.textInput}
+                isFocused={focus === "to"}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
-            </View>
-          </View>
 
-          {/* CC/BCC Toggle */}
-          {!showCcBcc && (
-            <Pressable
-              onPress={() => setShowCcBcc(true)}
-              style={styles.ccBccToggle}
-            >
-              <Ionicons name="add-circle" size={16} color="#FFFFFF" />
-              <Text style={styles.ccBccToggleText}>Add CC/BCC</Text>
-            </Pressable>
-          )}
+              {/* CC/BCC toggle */}
+              {!showCcBcc && (
+                <Pressable
+                  onPress={() => setShowCcBcc(true)}
+                  style={styles.inlineLink}
+                >
+                  <Ionicons name="add-circle" size={16} color="#FFFFFF" />
+                  <Text style={styles.inlineLinkText}>Add CC/BCC</Text>
+                </Pressable>
+              )}
 
-          {/* CC Field */}
-          {showCcBcc && (
-            <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>CC</Text>
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="copy"
-                  size={20}
-                  color="#6B7280"
-                  style={styles.inputIcon}
-                />
-                <TextInput
+              {/* CC */}
+              {showCcBcc && (
+                <Field
+                  label="CC"
+                  icon="copy"
                   value={cc}
+                  onFocus={() => setFocus("cc")}
+                  onBlur={() => setFocus(null)}
                   onChangeText={setCc}
                   placeholder="cc@company.com"
-                  placeholderTextColor="#6B7280"
-                  style={styles.textInput}
+                  isFocused={focus === "cc"}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
-              </View>
-            </View>
-          )}
+              )}
 
-          {/* BCC Field */}
-          {showCcBcc && (
-            <View style={styles.fieldContainer}>
-              <Text style={styles.fieldLabel}>BCC</Text>
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="eye-off"
-                  size={20}
-                  color="#6B7280"
-                  style={styles.inputIcon}
-                />
-                <TextInput
+              {/* BCC */}
+              {showCcBcc && (
+                <Field
+                  label="BCC"
+                  icon="eye-off"
                   value={bcc}
+                  onFocus={() => setFocus("bcc")}
+                  onBlur={() => setFocus(null)}
                   onChangeText={setBcc}
                   placeholder="bcc@company.com"
-                  placeholderTextColor="#6B7280"
-                  style={styles.textInput}
+                  isFocused={focus === "bcc"}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
-              </View>
-            </View>
-          )}
+              )}
 
-          {/* Subject Field */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Subject *</Text>
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="text"
-                size={20}
-                color="#6B7280"
-                style={styles.inputIcon}
-              />
-              <TextInput
+              {/* Subject */}
+              <Field
+                label="Subject *"
+                icon="text"
                 value={subject}
+                onFocus={() => setFocus("subject")}
+                onBlur={() => setFocus(null)}
                 onChangeText={setSubject}
                 placeholder="Enter a compelling subject line"
-                placeholderTextColor="#6B7280"
-                style={styles.textInput}
+                isFocused={focus === "subject"}
               />
-            </View>
-          </View>
 
-          {/* Message Body */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Message *</Text>
-            <View style={[styles.inputContainer, styles.textAreaContainer]}>
-              <TextInput
+              {/* Body */}
+              <Field
+                label="Message *"
+                icon={undefined}
                 value={body}
+                onFocus={() => setFocus("body")}
+                onBlur={() => setFocus(null)}
                 onChangeText={setBody}
                 placeholder="Write your professional message here..."
-                placeholderTextColor="#6B7280"
-                style={[styles.textInput, styles.textArea]}
+                isFocused={focus === "body"}
                 multiline
                 numberOfLines={8}
-                textAlignVertical="top"
+                textArea
               />
             </View>
-          </View>
-        </View>
 
-        {/* Action Buttons */}
-        <View style={styles.actionsContainer}>
-          <Pressable onPress={sendEmail} style={styles.sendButton}>
-            <LinearGradient
-              colors={["#FFFFFF", "#E0E0E0"]}
-              style={styles.sendButtonGradient}
-            >
-              <Ionicons name="send" size={20} color="#000000" />
-              <Text style={styles.sendButtonText}>Send Email</Text>
-            </LinearGradient>
-          </Pressable>
+            {/* Actions */}
+            <View style={styles.actions}>
+              <Pressable
+                onPress={sendEmail}
+                disabled={!canSend}
+                style={[styles.primaryBtn, !canSend && styles.disabledBtn]}
+              >
+                <LinearGradient
+                  colors={
+                    canSend ? ["#FFFFFF", "#E0E0E0"] : ["#BDBDBD", "#A6A6A6"]
+                  }
+                  style={styles.primaryBtnGradient}
+                >
+                  <Ionicons name="send" size={20} color="#000000" />
+                  <Text style={styles.primaryBtnText}>Send Email</Text>
+                </LinearGradient>
+              </Pressable>
 
-          <Pressable onPress={saveDraft} style={styles.draftButton}>
-            <View style={styles.draftButtonContent}>
-              <Ionicons name="save" size={20} color="#9CA3AF" />
-              <Text style={styles.draftButtonText}>Save Draft</Text>
+              <Pressable onPress={saveDraft} style={styles.secondaryBtn}>
+                <View style={styles.secondaryBtnInner}>
+                  <Ionicons name="save" size={20} color="#9CA3AF" />
+                  <Text style={styles.secondaryBtnText}>Save Draft</Text>
+                </View>
+              </Pressable>
             </View>
-          </Pressable>
+          </ScrollView>
         </View>
-      </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
+
+/* ---------- Reusable Field component ---------- */
+type FieldProps = {
+  label: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+  value: string;
+  onChangeText: (t: string) => void;
+  placeholder?: string;
+  isFocused?: boolean;
+  keyboardType?: any;
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  onFocus?: () => void;
+  onBlur?: () => void;
+  multiline?: boolean;
+  numberOfLines?: number;
+  textArea?: boolean;
+};
+
+function Field({
+  label,
+  icon,
+  value,
+  onChangeText,
+  placeholder,
+  isFocused,
+  keyboardType,
+  autoCapitalize,
+  onFocus,
+  onBlur,
+  multiline,
+  numberOfLines,
+  textArea,
+}: FieldProps) {
+  return (
+    <View style={styles.fieldBlock}>
+      <Text style={styles.fieldLabel}>{label}</Text>
+      <View
+        style={[
+          styles.inputWrap,
+          isFocused && styles.inputWrapFocused,
+          textArea && styles.inputWrapArea,
+        ]}
+      >
+        {!!icon && (
+          <Ionicons
+            name={icon}
+            size={20}
+            color="#9CA3AF"
+            style={styles.inputIcon}
+          />
+        )}
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor="#7D8590"
+          style={[styles.input, textArea && styles.inputArea]}
+          keyboardType={keyboardType}
+          autoCapitalize={autoCapitalize}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          multiline={multiline}
+          numberOfLines={numberOfLines}
+          textAlignVertical={textArea ? "top" : "center"}
+        />
+      </View>
     </View>
   );
 }
 
+/* ---------- Styles ---------- */
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0F0F0F",
-  },
-  scrollContainer: {
-    flex: 1,
-  },
+  safe: { flex: 1, backgroundColor: "#0F0F0F" },
+  flex: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#0F0F0F" },
+  scroll: { flex: 1 },
+  scrollContent: { paddingBottom: 28 },
+
+  /* Header */
   header: {
-    paddingTop: 40,
-    paddingBottom: 16,
+    paddingTop: 16,
+    paddingBottom: 14,
     paddingHorizontal: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
     marginBottom: 16,
   },
-  headerContent: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  headerRow: { flexDirection: "row", alignItems: "center" },
   headerIcon: {
-    width: 40,
-    height: 40,
+    width: 42,
+    height: 42,
     backgroundColor: "#374151",
-    borderRadius: 20,
+    borderRadius: 21,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
   },
-  headerText: {
-    flex: 1,
-  },
+  headerText: { flex: 1 },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "700",
     color: "#FFFFFF",
     marginBottom: 2,
   },
-  headerSubtitle: {
-    fontSize: 14,
-    color: "#9CA3AF",
-  },
+  headerSubtitle: { fontSize: 13, color: "#9CA3AF" },
+
+  /* Section container */
   section: {
     backgroundColor: "#1F2937",
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
     marginHorizontal: 16,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#374151",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOpacity: 0.18,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: { elevation: 5 },
+    }),
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "700",
     color: "#FFFFFF",
-    marginBottom: 20,
+    marginBottom: 14,
   },
-  templatesToggle: {
-    marginBottom: 16,
-  },
-  templatesToggleContent: {
+
+  /* Row card toggle */
+  rowCard: {
+    borderRadius: 12,
+    padding: 14,
+    backgroundColor: "#111827",
+    borderWidth: 1,
+    borderColor: "#2C3340",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#374151",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#4B5563",
+    justifyContent: "space-between",
   },
-  templatesIcon: {
-    width: 48,
-    height: 48,
-    backgroundColor: "#FFFFFF" + "20",
-    borderRadius: 24,
+  rowLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    marginRight: 8,
+  },
+  roundIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255,255,255,0.08)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
   },
-  templatesTextContainer: {
-    flex: 1,
-  },
-  templatesTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFFFFF",
-    marginBottom: 2,
-  },
-  templatesSubtitle: {
-    fontSize: 14,
-    color: "#9CA3AF",
-  },
-  templatesContainer: {
-    marginTop: 12,
-  },
+  rowText: { flex: 1 },
+  rowTitle: { color: "#FFFFFF", fontWeight: "600", fontSize: 15 },
+  rowSubtitle: { color: "#9CA3AF", fontSize: 12, marginTop: 2 },
+
+  /* Templates list */
+  templatesList: { marginTop: 12 },
   templateItem: {
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "#111827",
+    borderWidth: 1,
+    borderColor: "#2C3340",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#374151",
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: "#4B5563",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  templateLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    marginRight: 8,
   },
   templateIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.08)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
   },
-  templateText: {
-    flex: 1,
-  },
-  templateName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#FFFFFF",
-    marginBottom: 2,
-  },
-  templatePreview: {
-    fontSize: 12,
-    color: "#9CA3AF",
-  },
-  fieldContainer: {
-    marginBottom: 16,
-  },
+  templateText: { flex: 1 },
+  templateName: { color: "#FFFFFF", fontWeight: "600", marginBottom: 2 },
+  templatePreview: { color: "#9CA3AF", fontSize: 12 },
+
+  /* Fields */
+  fieldBlock: { marginBottom: 14 },
   fieldLabel: {
-    fontSize: 16,
-    fontWeight: "600",
     color: "#FFFFFF",
+    fontWeight: "600",
     marginBottom: 8,
+    fontSize: 14,
   },
-  inputContainer: {
+  inputWrap: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#374151",
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    minHeight: 48,
     borderWidth: 1,
     borderColor: "#4B5563",
   },
-  textAreaContainer: {
-    alignItems: "flex-start",
-    paddingVertical: 16,
-    minHeight: 120,
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 16,
-    color: "#FFFFFF",
-  },
-  textArea: {
-    textAlignVertical: "top",
-    minHeight: 88,
-  },
-  ccBccToggle: {
+  inputWrapFocused: { borderColor: "#A7B2FF" },
+  inputWrapArea: { alignItems: "flex-start", paddingVertical: 12 },
+  inputIcon: { marginRight: 10 },
+  input: { flex: 1, color: "#FFFFFF", fontSize: 16, paddingVertical: 8 },
+  inputArea: { minHeight: 120 },
+
+  /* Inline link */
+  inlineLink: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
-    paddingVertical: 8,
+    paddingVertical: 6,
+    marginBottom: 8,
   },
-  ccBccToggleText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#FFFFFF",
-    marginLeft: 8,
-  },
-  actionsContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-    gap: 12,
-  },
-  sendButton: {
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  sendButtonGradient: {
+  inlineLinkText: { color: "#FFFFFF", fontWeight: "500", marginLeft: 6 },
+
+  /* Actions */
+  actions: { paddingHorizontal: 16, paddingBottom: 28, gap: 12 },
+  primaryBtn: { borderRadius: 14, overflow: "hidden" },
+  disabledBtn: { opacity: 0.6 },
+  primaryBtnGradient: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 16,
-    borderRadius: 16,
+    paddingVertical: 14,
+    borderRadius: 14,
   },
-  sendButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000000",
-    marginLeft: 8,
-  },
-  draftButton: {
-    borderRadius: 16,
-  },
-  draftButtonContent: {
+  primaryBtnText: { color: "#000", fontWeight: "700", marginLeft: 8 },
+  secondaryBtn: { borderRadius: 14, overflow: "hidden" },
+  secondaryBtnInner: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 16,
+    paddingVertical: 14,
+    borderRadius: 14,
     backgroundColor: "#374151",
-    borderRadius: 16,
     borderWidth: 1,
     borderColor: "#4B5563",
   },
-  draftButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#9CA3AF",
-    marginLeft: 8,
-  },
+  secondaryBtnText: { color: "#9CA3AF", fontWeight: "700", marginLeft: 8 },
 });
