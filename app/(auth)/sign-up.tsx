@@ -9,13 +9,17 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { useSignUp } from "@clerk/clerk-expo";
+import { useSignUp, useOAuth } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import * as WebBrowser from "expo-web-browser";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
+  const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
   const router = useRouter();
 
   const [emailAddress, setEmailAddress] = React.useState("");
@@ -23,9 +27,34 @@ export default function SignUpScreen() {
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [code, setCode] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [googleLoading, setGoogleLoading] = React.useState(false);
   const [emailFocused, setEmailFocused] = React.useState(false);
   const [passwordFocused, setPasswordFocused] = React.useState(false);
   const [codeFocused, setCodeFocused] = React.useState(false);
+
+  const onGoogleSignUp = async () => {
+    if (googleLoading) return;
+
+    setGoogleLoading(true);
+    try {
+      const { createdSessionId, setActive: setActiveOAuth } =
+        await startOAuthFlow();
+
+      if (createdSessionId && setActiveOAuth) {
+        await setActiveOAuth({ session: createdSessionId });
+        router.replace("/(tabs)/home");
+      }
+    } catch (err: any) {
+      console.error("Google sign up error:", err);
+      Alert.alert(
+        "Google Sign Up Failed",
+        "Unable to sign up with Google. Please try again.",
+        [{ text: "OK", style: "default" }]
+      );
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   const onSignUpPress = async () => {
     if (!isLoaded || loading) return;
@@ -347,7 +376,7 @@ export default function SignUpScreen() {
                   codeFocused && styles.inputFocused,
                 ]}
               >
-                <Ionicons name="key-outline" size={20} color="#999999" />
+                <Ionicons name="key-outline" size={18} color="#999999" />
                 <TextInput
                   style={styles.input}
                   value={code}
@@ -414,18 +443,41 @@ export default function SignUpScreen() {
         <View style={styles.card}>
           <View style={styles.header}>
             <View style={styles.iconCircle}>
-              <Ionicons name="person-add-outline" size={56} color="#FFFFFF" />
+              <Ionicons name="person-add-outline" size={32} color="#FFFFFF" />
             </View>
             <Text style={styles.title}>CREATE ACCOUNT</Text>
             <Text style={styles.subtitle}>Join us today and get started</Text>
           </View>
 
           <View style={styles.form}>
+            {/* Google Sign Up Button */}
+            <TouchableOpacity
+              onPress={onGoogleSignUp}
+              disabled={googleLoading}
+              activeOpacity={0.85}
+              style={styles.googleButton}
+            >
+              <View style={styles.googleButtonContent}>
+                <Ionicons name="logo-google" size={18} color="#4285F4" />
+                <Text style={styles.googleButtonText}>
+                  {googleLoading
+                    ? "Creating account..."
+                    : "Continue with Google"}
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
             <Text style={styles.label}>EMAIL ADDRESS</Text>
             <View
               style={[styles.inputWrapper, emailFocused && styles.inputFocused]}
             >
-              <Ionicons name="mail-outline" size={20} color="#999999" />
+              <Ionicons name="mail-outline" size={18} color="#999999" />
               <TextInput
                 style={styles.input}
                 autoCapitalize="none"
@@ -446,7 +498,7 @@ export default function SignUpScreen() {
                 passwordFocused && styles.inputFocused,
               ]}
             >
-              <Ionicons name="lock-closed-outline" size={20} color="#999999" />
+              <Ionicons name="lock-closed-outline" size={18} color="#999999" />
               <TextInput
                 style={styles.input}
                 value={password}
@@ -505,8 +557,8 @@ const styles = StyleSheet.create({
   },
   card: {
     width: "100%",
-    borderRadius: 24,
-    padding: 32,
+    borderRadius: 16,
+    padding: 20,
     backgroundColor: "rgba(26, 26, 26, 0.95)",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
@@ -516,9 +568,9 @@ const styles = StyleSheet.create({
     top: 20,
     left: 20,
     zIndex: 10,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     justifyContent: "center",
     alignItems: "center",
@@ -527,30 +579,30 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 24,
   },
   iconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.2)",
   },
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: "800",
     color: "#FFFFFF",
-    marginBottom: 8,
-    letterSpacing: 2,
+    marginBottom: 4,
+    letterSpacing: 1.5,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#999999",
-    marginTop: 4,
+    marginTop: 2,
     textAlign: "center",
     letterSpacing: 0.5,
   },
@@ -558,12 +610,12 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   label: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700",
     color: "#999999",
-    marginBottom: 8,
-    marginTop: 16,
-    letterSpacing: 1.5,
+    marginBottom: 6,
+    marginTop: 12,
+    letterSpacing: 1.2,
   },
   inputWrapper: {
     flexDirection: "row",
@@ -571,10 +623,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    marginBottom: 8,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    marginBottom: 6,
   },
   inputFocused: {
     borderColor: "#FFFFFF",
@@ -583,48 +635,90 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     color: "#FFFFFF",
-    marginLeft: 12,
+    marginLeft: 10,
     fontWeight: "500",
   },
   button: {
-    borderRadius: 12,
-    paddingVertical: 18,
+    borderRadius: 10,
+    paddingVertical: 14,
     alignItems: "center",
-    marginTop: 32,
+    marginTop: 20,
   },
   buttonText: {
     color: "#000000",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "800",
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
   },
   linkContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 32,
+    marginTop: 20,
   },
   linkText: {
     color: "#999999",
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "500",
   },
   linkHighlight: {
     color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "700",
     textDecorationLine: "underline",
   },
   resendButton: {
-    marginTop: 20,
+    marginTop: 16,
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
   resendText: {
     color: "#999999",
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "600",
     textDecorationLine: "underline",
+  },
+  googleButton: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    paddingVertical: 12,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  googleButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  googleButtonText: {
+    color: "#333333",
+    fontSize: 15,
+    fontWeight: "600",
+    marginLeft: 10,
+  },
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+  },
+  dividerText: {
+    color: "#999999",
+    fontSize: 12,
+    fontWeight: "600",
+    marginHorizontal: 12,
+    letterSpacing: 1,
   },
 });
