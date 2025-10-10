@@ -111,7 +111,7 @@ export default function Home() {
             <View style={styles.headerContent}>
               <View style={styles.headerRow}>
                 <View style={styles.iconContainer}>
-                  <Ionicons name="document-text" size={32} color="#FFFFFF" />
+                  <Ionicons name="document-text" size={20} color="#FFFFFF" />
                 </View>
                 <View style={styles.headerTextContainer}>
                   <Text style={styles.headerTitle}>JobAlign AI</Text>
@@ -152,7 +152,7 @@ export default function Home() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionIconContainer}>
-                <Ionicons name="cloud-upload" size={24} color="#FFFFFF" />
+                <Ionicons name="cloud-upload" size={18} color="#FFFFFF" />
               </View>
               <View style={styles.sectionTextContainer}>
                 <Text style={styles.sectionTitle}>Upload Your CV</Text>
@@ -268,7 +268,7 @@ export default function Home() {
             <View style={styles.section}>
               <View style={styles.loadingContainer}>
                 <View style={styles.loadingIcon}>
-                  <Ionicons name="analytics" size={40} color="#FFFFFF" />
+                  <Ionicons name="analytics" size={24} color="#FFFFFF" />
                 </View>
                 <Text style={styles.loadingTitle}>Analyzing Your CV</Text>
                 <Text style={styles.loadingDescription}>
@@ -363,7 +363,7 @@ export default function Home() {
                           { backgroundColor: job.color + "20" },
                         ]}
                       >
-                        <Ionicons name={job.icon} size={28} color={job.color} />
+                        <Ionicons name={job.icon} size={20} color={job.color} />
                       </View>
                       <View style={styles.jobOptionText}>
                         <Text
@@ -408,78 +408,78 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 24,
+    borderRadius: 16,
+    padding: 16,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 8,
-    marginBottom: 24,
+    shadowRadius: 8,
+    elevation: 6,
+    marginBottom: 16,
   },
   headerContainer: {
     position: "relative",
   },
   headerGradient: {
-    height: 280,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    height: 200,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   headerContent: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingHorizontal: 16,
+    paddingTop: 40,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 12,
   },
   iconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     backgroundColor: "rgba(99, 102, 241, 0.2)",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 16,
+    marginRight: 12,
   },
   headerTextContainer: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: 32,
+    fontSize: 22,
     fontWeight: "bold",
     color: "#FFFFFF",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerSubtitle: {
-    fontSize: 18,
+    fontSize: 14,
     color: "#D1D5DB",
   },
   headerDescription: {
-    fontSize: 16,
+    fontSize: 13,
     color: "#D1D5DB",
-    lineHeight: 24,
+    lineHeight: 18,
     opacity: 0.9,
   },
   statsCardContainer: {
     position: "absolute",
-    bottom: -80,
-    left: 24,
-    right: 24,
-    marginBottom: 16,
+    bottom: -50,
+    left: 16,
+    right: 16,
+    marginBottom: 12,
   },
   statsCard: {
     backgroundColor: "#1F2937",
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 12,
+    padding: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 12,
+    shadowRadius: 8,
+    elevation: 8,
     borderWidth: 1,
     borderColor: "#374151",
   },
@@ -491,59 +491,59 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#FFFFFF",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 10,
     color: "#9CA3AF",
   },
   content: {
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 24,
-    marginTop: 30,
+    paddingHorizontal: 16,
+    paddingTop: 40,
+    paddingBottom: 16,
+    marginTop: 20,
   },
   section: {
     backgroundColor: "#1F2937",
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: "#374151",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowRadius: 4,
+    elevation: 4,
   },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 12,
   },
   sectionIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
     backgroundColor: "rgba(255, 255, 255, 0.1)",
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 16,
+    marginRight: 12,
   },
   sectionTextContainer: {
     flex: 1,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#FFFFFF",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   sectionSubtitle: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#9CA3AF",
   },
   changeButton: {

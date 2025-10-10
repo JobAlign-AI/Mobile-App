@@ -41,10 +41,10 @@ export default function Button({
   return (
     <Pressable
       onPress={onPress}
-      className={`px-6 py-4 rounded-xl ${getVariantClasses()}`}
+      className={`px-4 py-3 rounded-lg ${getVariantClasses()}`}
     >
       <Text
-        className={`font-bold text-center text-base tracking-wider ${getTextClasses()}`}
+        className={`font-bold text-center text-sm tracking-wider ${getTextClasses()}`}
       >
         {title.toUpperCase()}
       </Text>

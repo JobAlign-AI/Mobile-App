@@ -26,18 +26,18 @@ export const SignOutButton = () => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: "#EF4444",
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 6,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
   },
   text: {
     color: "#FFFFFF",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "800",
-    letterSpacing: 1.5,
+    letterSpacing: 1,
   },
 });
