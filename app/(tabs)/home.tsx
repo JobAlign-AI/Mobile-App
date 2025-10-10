@@ -75,13 +75,13 @@ export default function Home() {
 
     if (result.assets && result.assets.length > 0) {
       setCvName(result.assets[0].name);
-      setIsAnalyzing(true);
+      // setIsAnalyzing(true);
 
-      // Simulate analysis
-      setTimeout(() => {
-        setSimilarity((85 + Math.random() * 15).toFixed(1));
-        setIsAnalyzing(false);
-      }, 2500);
+      // // Simulate analysis
+      // setTimeout(() => {
+      //   setSimilarity((85 + Math.random() * 15).toFixed(1));
+      //   setIsAnalyzing(false);
+      // }, 2500);
     }
   };
 
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 24,
     marginTop: 30,
-    marginBottom: 50,
+    marginBottom: 55,
   },
   section: {
     backgroundColor: "#1F2937",

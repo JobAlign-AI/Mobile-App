@@ -45,7 +45,7 @@ export default function TabLayout() {
             borderWidth: 1,
             borderColor: "rgba(255, 255, 255, 0.1)",
             paddingTop: 10,
-            paddingBottom: Platform.OS === "ios" ? 20 : 10,
+            paddingBottom: Platform.OS === "ios" ? 20 : 5,
           },
           tabBarBackground: () => (
             <LinearGradient
