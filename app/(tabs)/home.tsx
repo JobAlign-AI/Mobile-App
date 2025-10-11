@@ -11,10 +11,16 @@ import {
   StatusBar,
   Platform,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { LinearGradient } from "expo-linear-gradient";
+import {
+  CLOUDINARY_CONFIG,
+  API_CONFIG,
+  validateConfig,
+} from "../../config/cloudinary";
 
 const { width } = Dimensions.get("window");
 
@@ -22,8 +28,11 @@ export default function Home() {
   const [selectedJob, setSelectedJob] = useState("Software Engineer");
   const [modalVisible, setModalVisible] = useState(false);
   const [cvName, setCvName] = useState<string | null>(null);
+  const [cvUri, setCvUri] = useState<string | null>(null);
   const [similarity, setSimilarity] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [cloudinaryUrl, setCloudinaryUrl] = useState<string | null>(null);
 
   const jobOptions = [
     {
@@ -68,23 +77,127 @@ export default function Home() {
     jobOptions.find((job) => job.title === selectedJob) || jobOptions[0];
 
   const pickDocument = async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      ],
-    });
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: [
+          "application/pdf",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ],
+      });
 
-    if (result.assets && result.assets.length > 0) {
-      setCvName(result.assets[0].name);
-      setIsAnalyzing(true);
+      if (result.assets && result.assets.length > 0) {
+        const file = result.assets[0];
+        setCvName(file.name);
+        setCvUri(file.uri);
+        // Reset previous analysis
+        setSimilarity(null);
+        setCloudinaryUrl(null);
+      }
+    } catch (error) {
+      console.error("Error picking document:", error);
+      Alert.alert("Error", "Failed to pick document. Please try again.");
+    }
+  };
 
-      // simulate analysis
-      setTimeout(() => {
-        setSimilarity((85 + Math.random() * 15).toFixed(1));
-        setIsAnalyzing(false);
-      }, 2500);
+  const uploadToCloudinary = async (fileUri: string, fileName: string) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", {
+        uri: fileUri,
+        type: "application/pdf",
+        name: fileName,
+      } as any);
+      formData.append("upload_preset", CLOUDINARY_CONFIG.UPLOAD_PRESET);
+      formData.append("cloud_name", CLOUDINARY_CONFIG.CLOUD_NAME);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.CLOUD_NAME}/raw/upload`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.secure_url) {
+        return data.secure_url;
+      } else {
+        throw new Error("Upload failed");
+      }
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      throw error;
+    }
+  };
+
+  const sendToBackend = async (cloudinaryUrl: string, jobTitle: string) => {
+    try {
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ANALYZE_CV}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cvUrl: cloudinaryUrl,
+            targetJob: jobTitle,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.score !== undefined) {
+        return data.score;
+      } else {
+        throw new Error("Analysis failed");
+      }
+    } catch (error) {
+      console.error("Backend API error:", error);
+      throw error;
+    }
+  };
+
+  const processCv = async () => {
+    if (!cvUri || !cvName) {
+      Alert.alert("Error", "Please upload a CV first.");
+      return;
+    }
+
+    // Validate environment configuration
+    if (!validateConfig()) {
+      Alert.alert(
+        "Configuration Error",
+        "Cloudinary configuration is missing. Please check your environment variables."
+      );
+      return;
+    }
+
+    setIsProcessing(true);
+    setIsAnalyzing(true);
+
+    try {
+      // Step 1: Upload to Cloudinary
+      const uploadedUrl = await uploadToCloudinary(cvUri, cvName);
+      setCloudinaryUrl(uploadedUrl);
+
+      // Step 2: Send to backend for analysis
+      const score = await sendToBackend(uploadedUrl, selectedJob);
+      setSimilarity(score.toString());
+
+      Alert.alert("Success", "CV processed successfully!");
+    } catch (error) {
+      console.error("Processing error:", error);
+      Alert.alert("Error", "Failed to process CV. Please try again.");
+    } finally {
+      setIsProcessing(false);
+      setIsAnalyzing(false);
     }
   };
 
@@ -215,6 +328,23 @@ export default function Home() {
                   </View>
                 </View>
               )}
+
+              {/* Cloudinary Upload Status */}
+              {cloudinaryUrl && (
+                <View style={styles.cloudinarySuccess}>
+                  <View style={styles.uploadSuccessContent}>
+                    <Ionicons name="cloud-done" size={20} color="#34D399" />
+                    <Text style={styles.cloudinarySuccessText}>
+                      Uploaded to Cloudinary
+                    </Text>
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={20}
+                      color="#34D399"
+                    />
+                  </View>
+                </View>
+              )}
             </View>
 
             {/* Job Selection */}
@@ -259,16 +389,10 @@ export default function Home() {
               </View>
             </View>
 
-            {/* Analyze Button */}
-            {cvName && !similarity && !isAnalyzing && (
+            {/* Process CV Button */}
+            {cvName && !similarity && !isProcessing && (
               <Pressable
-                onPress={() => {
-                  setIsAnalyzing(true);
-                  setTimeout(() => {
-                    setSimilarity((85 + Math.random() * 15).toFixed(1));
-                    setIsAnalyzing(false);
-                  }, 2500);
-                }}
+                onPress={processCv}
                 style={styles.analyzeButtonContainer}
               >
                 <LinearGradient
@@ -276,13 +400,31 @@ export default function Home() {
                   style={styles.analyzeButton}
                 >
                   <View style={styles.analyzeButtonContent}>
-                    <Ionicons name="analytics" size={24} color="#000000" />
+                    <Ionicons name="cloud-upload" size={24} color="#000000" />
                     <Text style={styles.analyzeButtonText}>
-                      Analyze CV Match
+                      Process CV & Get Score
                     </Text>
                   </View>
                 </LinearGradient>
               </Pressable>
+            )}
+
+            {/* Processing Loading */}
+            {isProcessing && (
+              <View style={styles.section}>
+                <View style={styles.loadingContainer}>
+                  <View style={styles.loadingIcon}>
+                    <Ionicons name="cloud-upload" size={24} color="#FFFFFF" />
+                  </View>
+                  <Text style={styles.loadingTitle}>Processing Your CV</Text>
+                  <Text style={styles.loadingDescription}>
+                    Uploading to Cloudinary and analyzing with AI...
+                  </Text>
+                  <View style={styles.progressContainer}>
+                    <View style={styles.progressBar} />
+                  </View>
+                </View>
+              </View>
             )}
 
             {/* Loading */}
@@ -621,6 +763,20 @@ const styles = StyleSheet.create({
   uploadSuccessContent: { flexDirection: "row", alignItems: "center" },
   uploadSuccessText: {
     color: "#FFFFFF",
+    fontWeight: "500",
+    marginLeft: 8,
+    flex: 1,
+  },
+  cloudinarySuccess: {
+    marginTop: 8,
+    padding: 14,
+    backgroundColor: "rgba(52, 211, 153, 0.1)",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(52, 211, 153, 0.3)",
+  },
+  cloudinarySuccessText: {
+    color: "#34D399",
     fontWeight: "500",
     marginLeft: 8,
     flex: 1,
