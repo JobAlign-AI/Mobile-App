@@ -16,6 +16,7 @@
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
+    "cloudinary": "^2.7.0",
     "expo": "~54.0.12",
     "expo-auth-session": "^7.0.8",
     "expo-blur": "^15.0.7",
@@ -28,11 +29,7 @@
     "expo-linear-gradient": "~15.0.7",
     "expo-linking": "~8.0.8",
     "expo-router": "~6.0.10",
-<<<<<<< HEAD
     "expo-secure-store": "^15.0.7",
-=======
-    "expo-secure-store": "~15.0.7",
->>>>>>> d5f13f583b440a56754b489b98a4bd86d5ec5cc4
     "expo-splash-screen": "~31.0.10",
     "expo-status-bar": "~3.0.8",
     "expo-symbols": "~1.0.7",
@@ -43,6 +40,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
     "react-native-gesture-handler": "~2.28.0",
+    "react-native-image-picker": "^8.2.1",
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
